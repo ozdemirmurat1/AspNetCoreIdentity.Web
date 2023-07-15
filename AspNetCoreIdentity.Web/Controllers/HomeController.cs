@@ -50,14 +50,22 @@ namespace AspNetCoreIdentity.Web.Controllers
                 return View();
             }
 
-            var signInResult = await _signInManager.PasswordSignInAsync(hasUser, model.Password, model.RememberMe, false);
+            // bu işlemde cookie oluşturulur.
+            var signInResult = await _signInManager.PasswordSignInAsync(hasUser, model.Password,model.RememberMe,true);
 
             if (signInResult.Succeeded)
             {
                 return Redirect(returnUrl);
             }
 
-            ModelState.AddModelErrorList(new List<string> { "Email veya şifreniz yanlış" });
+            if (signInResult.IsLockedOut)
+            {
+                ModelState.AddModelErrorList(new List<string> { "3 dakika boyunca giriş yapamazsınız." });
+                return View();
+            }
+                
+            
+            ModelState.AddModelErrorList(new List<string> { $"Email veya şifreniz yanlış",$"(Başarısız giriş sayısı:{await _userManager.GetAccessFailedCountAsync(hasUser)}" });
             
 
             return View();

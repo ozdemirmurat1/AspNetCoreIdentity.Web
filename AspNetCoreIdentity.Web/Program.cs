@@ -14,6 +14,18 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddIdentityWithExt();
 
+builder.Services.ConfigureApplicationCookie(opt =>
+{
+    var cookieBuilder=new CookieBuilder();
+
+    cookieBuilder.Name = "UdemyAppCookie";
+    opt.LoginPath = new PathString("/Home/SignIn");
+    opt.Cookie = cookieBuilder;
+    opt.ExpireTimeSpan = TimeSpan.FromDays(60);
+    // Sliding süresi kullanýcý her giriþ yaptýðýnda cookie yenilenir.
+    opt.SlidingExpiration = true;
+});
+
 
 var app = builder.Build();
 
