@@ -20,6 +20,7 @@ builder.Services.ConfigureApplicationCookie(opt =>
 
     cookieBuilder.Name = "UdemyAppCookie";
     opt.LoginPath = new PathString("/Home/SignIn");
+    opt.LogoutPath = new PathString("/Member/Logout");
     opt.Cookie = cookieBuilder;
     opt.ExpireTimeSpan = TimeSpan.FromDays(60);
     // Sliding süresi kullanýcý her giriþ yaptýðýnda cookie yenilenir.
