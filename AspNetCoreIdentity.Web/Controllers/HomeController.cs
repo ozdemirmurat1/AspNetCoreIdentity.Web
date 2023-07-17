@@ -114,27 +114,74 @@ namespace AspNetCoreIdentity.Web.Controllers
         {
             //7250 portundan ayağa kalkıyor htt://localhost:7250
 
-            var hasUser=await _userManager.FindByEmailAsync(request.Email);
+            var hasUser = await _userManager.FindByEmailAsync(request.Email);
 
             if (hasUser == null)
-            {
-                /* String.Empty diyerek özellikle bir hata belirtmedik  */
 
-                ModelState.AddModelError(String.Empty, "Bu email adresine sahip kullanıcı bulunamamıştır");
+            {
+                // String.Empty diyerek özellikle bir hata belirtmedik.
+                ModelState.AddModelError(String.Empty, "Bu email adresine sahip kullanıcı bulunamamıştır.");
                 return View();
             }
 
-            string passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(hasUser);
+            string passwordResestToken = await _userManager.GeneratePasswordResetTokenAsync(hasUser);
 
-            var passwordResetLink = Url.Action("ResetPassword", "Home", new { userId = hasUser.Id, Token = passwordResetToken },HttpContext.Request.Scheme);
+            var passwordResetLink = Url.Action("ResetPassword", "Home", new { userId = hasUser.Id, Token = passwordResestToken }, HttpContext.Request.Scheme);
 
-            await _emailService.SendResetPasswordEmail(passwordResetLink, hasUser.Email);
+            //örnek link https://localhost:7006?userId=12213&token=aajsdfjdsalkfjkdsfj
 
-            TempData["SuccessMessage"] = "Şifre yenileme linki e-posta adresinize gönderilmiştir.";
+            await _emailService.SendResetPasswordEmail(passwordResetLink!, hasUser.Email!);
+
+            TempData["SuccessMessage"] = "Şifre yenileme linki, eposta adresinize gönderilmiştir";
+
             return RedirectToAction(nameof(ForgetPassword));
-               
+
 
         }
+
+        public IActionResult ResetPassword(string userId,string token)
+        {
+            // Requestler arası data TempData üzerinden taşınır. ViewModel de hidden input type üzerinden de alınabilir
+
+            TempData["userId"] = userId;
+            TempData["token"] = token;
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel request)
+        {
+            var userId = TempData["userId"].ToString();
+            var token = TempData["token"].ToString();
+
+            if(userId == null || token==null) 
+            {
+                throw new Exception("Bir hata meydana geldi");
+            }
+
+            var hasUser = await _userManager.FindByIdAsync(userId);
+            if (hasUser == null)
+            {
+                ModelState.AddModelError(String.Empty, "Kullanıcı Bulunamamıştır");
+
+            }
+
+
+            var result=await _userManager.ResetPasswordAsync(hasUser,(string)token,request.Password);
+            if (result.Succeeded)
+            {
+                TempData["SuccessMessage"] = "Şifreniz başarıyla yenilenmiştir.";
+            }
+            else
+            {
+                ModelState.AddModelErrorList(result.Errors.Select(x => x.Description).ToList());
+                
+            }
+
+            return View();
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
