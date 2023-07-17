@@ -15,6 +15,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlCon"));
 });
 
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    // Default deðer zaten 30 biz bunun nasýl deðiþtirilebileceðini görmek için yazdýk.
+    options.ValidationInterval = TimeSpan.FromMinutes(30);
+});
+
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddIdentityWithExt();
 // DbContext in yaþam döngüsü scope tur.
