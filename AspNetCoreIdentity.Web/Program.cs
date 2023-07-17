@@ -1,5 +1,7 @@
 using AspNetCoreIdentity.Web.Extensions;
 using AspNetCoreIdentity.Web.Models;
+using AspNetCoreIdentity.Web.OptionsModel;
+using AspNetCoreIdentity.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +15,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlCon"));
 });
 
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddIdentityWithExt();
+// DbContext in yaþam döngüsü scope tur.
+builder.Services.AddScoped<IEmailService,EmailService>();
 
 builder.Services.ConfigureApplicationCookie(opt =>
 {
