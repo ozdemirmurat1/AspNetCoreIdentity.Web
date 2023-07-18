@@ -7,7 +7,7 @@ namespace AspNetCoreIdentity.Web.Models
         public string City { get; set; }
 
         public string Picture { get; set; }
-        public DateTime? Birthday { get; set; }
+        public DateTime? BirthDate { get; set; }
         public byte? Gender { get; set; }
     }
 }
