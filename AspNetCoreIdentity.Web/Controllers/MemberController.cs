@@ -1,4 +1,5 @@
-﻿using AspNetCoreIdentity.Web.Models;
+﻿using AspNetCoreIdentity.Web.Extensions;
+using AspNetCoreIdentity.Web.Models;
 using AspNetCoreIdentity.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -34,9 +35,49 @@ namespace AspNetCoreIdentity.Web.Controllers
 
         public async Task LogOut()
         {
-            await _signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync();       
+        }
 
-            
+        public async Task<IActionResult> PasswordChange()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PasswordChange(PasswordChangeViewModel request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            var currentUser =await _userManager.FindByNameAsync(User.Identity.Name);
+
+            var checkOldPassword =await _userManager.CheckPasswordAsync(currentUser, request.PasswordOld);
+
+            if (!checkOldPassword)
+            {
+                ModelState.AddModelError(string.Empty, "Eski şifreniz yanlış");
+                return View();
+            }
+
+            var resultChangePassword = await _userManager.ChangePasswordAsync(currentUser,request.PasswordOld,request.PasswordNew);
+
+            if (!resultChangePassword.Succeeded)
+            {
+                ModelState.AddModelErrorList(resultChangePassword.Errors.Select(x=>x.Description).ToList());
+                return View();
+            }
+
+            //SecurityStamp bilgisi kullanıcının hassas bilgisi değiştiği zaman değişir.
+            // kullanıcının cookie'si yenilenmesi için ilk önce signOut yaptık daha sonra PasswordSignIn ile login olduk.
+            await _userManager.UpdateSecurityStampAsync(currentUser);
+            await _signInManager.SignOutAsync();
+            await _signInManager.PasswordSignInAsync(currentUser, request.PasswordNew, true,false);
+
+            TempData["SuccessMessage"] = "Şifreniz başarıyla değiştirilmiştir.";
+
+            return View();
         }
     }
 }

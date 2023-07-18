@@ -6,7 +6,7 @@ namespace AspNetCoreIdentity.Web.ViewModels
     {
         [DataType(DataType.Password)]
         [Required(ErrorMessage = "Şifre alanı boş bırakılamaz.")]
-        [Display(Name = "Yeni Şifre :")]
+        [Display(Name = "Eski Şifre :")]
         [MinLength(6,ErrorMessage ="Şifreniz en az 6 karakter olabilir.")]
         public string PasswordOld { get; set; }
 
@@ -21,6 +21,6 @@ namespace AspNetCoreIdentity.Web.ViewModels
         [Required(ErrorMessage = "Yeni Şifre tekrar alanı boş bırakılamaz.")]
         [Display(Name = "Yeni Şifre Tekrar :")]
         [MinLength(6, ErrorMessage = "Şifreniz en az 6 karakter olabilir.")]
-        public string PasswordConfirm { get; set; }
+        public string PasswordNewConfirm { get; set; }
     }
 }
