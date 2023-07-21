@@ -22,7 +22,7 @@ namespace AspNetCoreIdentity.Web.Areas.Admin.Controllers
         }
 
         [Authorize(Roles = "admin")]
-        [Authorize(Roles = "role-action")]
+        //[Authorize(Roles = "role-action")]
         public async Task<IActionResult> Index()
         {
             var roles =await _roleManager.Roles.Select(x => new RoleViewModel()
@@ -36,7 +36,7 @@ namespace AspNetCoreIdentity.Web.Areas.Admin.Controllers
         }
 
         [Authorize(Roles = "admin")]
-        [Authorize(Roles = "role-action")]
+        //[Authorize(Roles = "role-action")]
         public IActionResult RoleCreate()
         {
             return View();
@@ -44,7 +44,7 @@ namespace AspNetCoreIdentity.Web.Areas.Admin.Controllers
 
 
         [Authorize(Roles = "admin")]
-        [Authorize(Roles = "role-action")]
+        //[Authorize(Roles = "role-action")]
         [HttpPost]
         public async Task<IActionResult> RoleCreate(RoleCreateViewModel request)
         {
@@ -61,7 +61,7 @@ namespace AspNetCoreIdentity.Web.Areas.Admin.Controllers
         }
 
         [Authorize(Roles = "admin")]
-        [Authorize(Roles = "role-action")]
+        //[Authorize(Roles = "role-action")]
         public async Task<IActionResult> RoleUpdate(string id)
         {
             var roleToUpdate = await _roleManager.FindByIdAsync(id);
@@ -75,7 +75,7 @@ namespace AspNetCoreIdentity.Web.Areas.Admin.Controllers
         }
 
         [Authorize(Roles = "admin")]
-        [Authorize(Roles = "role-action")]
+        //[Authorize(Roles = "role-action")]
         [HttpPost]
         public async Task<IActionResult> RoleUpdate(RoleUpdateViewModel request)
         {
@@ -94,7 +94,7 @@ namespace AspNetCoreIdentity.Web.Areas.Admin.Controllers
         }
 
         [Authorize(Roles = "admin")]
-        [Authorize(Roles = "role-action")]
+        //[Authorize(Roles = "role-action")]
         public async Task<IActionResult> RoleDelete(string id)
         {
             var roleToDelete = await _roleManager.FindByIdAsync(id);
@@ -112,7 +112,7 @@ namespace AspNetCoreIdentity.Web.Areas.Admin.Controllers
             TempData["SuccessMessage"] = "Rol silinmiştir.";
             return RedirectToAction(nameof(RolesController.Index));
         }
-
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> AssignRoleToUser(string id)
         {
             var currentUser = await _userManager.FindByIdAsync(id);
@@ -143,6 +143,7 @@ namespace AspNetCoreIdentity.Web.Areas.Admin.Controllers
             return View(roleViewModelList);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> AssignRoleToUser(string userId, List<AssignRoleToUserViewModel> requestList)
         {
