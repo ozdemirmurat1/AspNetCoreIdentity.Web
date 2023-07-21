@@ -29,8 +29,8 @@ namespace AspNetCoreIdentity.Web.Controllers
         {
             // HttpContext controller olmayan sınıflarda ulaşmak için kullanılır. Aşağıdaki metotta kullansak da olur kullanmasak da olur. Zaten controller sınıfındayız. IHttpContextAccessor sınıfını da dependencyInjection yaparak HttpContext e ulaşabilirsin. Dah sonra builder.Services.AddHttpContextAccessor(); u Program cs.e eklemelisin.
 
-            var userClaims = HttpContext.User.Claims.ToList();
-            var email = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
+            //var userClaims = HttpContext.User.Claims.ToList();
+            //var email = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
 
             var currentUser=await _userManager.FindByNameAsync(User.Identity.Name);
 
@@ -185,5 +185,21 @@ namespace AspNetCoreIdentity.Web.Controllers
 
             return View();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Claims()
+        {
+            var userClaims = User.Claims.Select(x => new ClaimViewModel()
+            {
+                Issuer=x.Issuer,
+                Type=x.Type,
+                Value=x.Value,
+            }).ToList();
+
+            return View(userClaims);
+        }
+
+
+
     }
 }
