@@ -102,6 +102,7 @@ namespace AspNetCoreIdentity.Web.Areas.Admin.Controllers
         public async Task<IActionResult> AssignRoleToUser(string id)
         {
             var currentUser = await _userManager.FindByIdAsync(id);
+            ViewBag.userId = id;
 
             if (currentUser == null)
                 throw new Exception("Kullanıcı bulunamamıştır");
@@ -126,6 +127,25 @@ namespace AspNetCoreIdentity.Web.Areas.Admin.Controllers
             }
 
             return View(roleViewModelList);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AssignRoleToUser(string userId, List<AssignRoleToUserViewModel> requestList)
+        {
+
+            var userToAssignRoles = (await _userManager.FindByIdAsync(userId))!;
+
+            foreach (var role in requestList)
+            {
+                if(role.Exist)
+                     await _userManager.AddToRoleAsync(userToAssignRoles,role.Name);
+
+                else
+                    await _userManager.RemoveFromRoleAsync(userToAssignRoles,role.Name);
+            }
+
+
+            return RedirectToAction(nameof(HomeController.UserList),"Home");
         }
 
     }
