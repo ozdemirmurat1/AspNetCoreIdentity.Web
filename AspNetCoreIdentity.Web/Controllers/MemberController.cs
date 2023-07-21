@@ -168,5 +168,15 @@ namespace AspNetCoreIdentity.Web.Controllers
             return RedirectToAction("Index");
 
         }
+
+        public async Task<IActionResult> AccessDenied(string ReturnUrl)
+        {
+            string message=string.Empty;
+            message = "Bu sayfayı görmeye yetkiniz yoktur.Yetki almak için yöneticinizle görüşünüz.";
+
+            ViewBag.message = message;
+
+            return View();
+        }
     }
 }
