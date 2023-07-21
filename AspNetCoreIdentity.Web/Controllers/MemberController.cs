@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.FileProviders;
+using System.Security.Claims;
 
 namespace AspNetCoreIdentity.Web.Controllers
 {
@@ -15,6 +16,7 @@ namespace AspNetCoreIdentity.Web.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
         private readonly IFileProvider _fileProvider;
+        //private readonly IHttpContextAccessor _contextAccessor;
 
         public MemberController(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager, IFileProvider fileProvider)
         {
@@ -25,6 +27,11 @@ namespace AspNetCoreIdentity.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
+            // HttpContext controller olmayan sınıflarda ulaşmak için kullanılır. Aşağıdaki metotta kullansak da olur kullanmasak da olur. Zaten controller sınıfındayız. IHttpContextAccessor sınıfını da dependencyInjection yaparak HttpContext e ulaşabilirsin. Dah sonra builder.Services.AddHttpContextAccessor(); u Program cs.e eklemelisin.
+
+            var userClaims = HttpContext.User.Claims.ToList();
+            var email = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
+
             var currentUser=await _userManager.FindByNameAsync(User.Identity.Name);
 
             var userViewModel = new UserViewModel 

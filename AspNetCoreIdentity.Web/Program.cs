@@ -29,6 +29,7 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 builder.Services.AddIdentityWithExt();
 // DbContext in yaþam döngüsü scope tur.
 builder.Services.AddScoped<IEmailService,EmailService>();
+//builder.Services.AddHttpContextAccessor();
 
 builder.Services.ConfigureApplicationCookie(opt =>
 {
