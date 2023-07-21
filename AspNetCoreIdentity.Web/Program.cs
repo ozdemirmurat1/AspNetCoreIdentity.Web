@@ -1,7 +1,9 @@
+using AspNetCoreIdentity.Web.ClaimProviders;
 using AspNetCoreIdentity.Web.Extensions;
 using AspNetCoreIdentity.Web.Models;
 using AspNetCoreIdentity.Web.OptionsModel;
 using AspNetCoreIdentity.Web.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -29,6 +31,7 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 builder.Services.AddIdentityWithExt();
 // DbContext in yaþam döngüsü scope tur.
 builder.Services.AddScoped<IEmailService,EmailService>();
+builder.Services.AddScoped<IClaimsTransformation,UserClaimProvider>();
 //builder.Services.AddHttpContextAccessor();
 
 builder.Services.ConfigureApplicationCookie(opt =>
