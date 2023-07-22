@@ -2,8 +2,10 @@ using AspNetCoreIdentity.Web.ClaimProviders;
 using AspNetCoreIdentity.Web.Extensions;
 using AspNetCoreIdentity.Web.Models;
 using AspNetCoreIdentity.Web.OptionsModel;
+using AspNetCoreIdentity.Web.Requirements;
 using AspNetCoreIdentity.Web.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -32,6 +34,7 @@ builder.Services.AddIdentityWithExt();
 // DbContext in yaþam döngüsü scope tur.
 builder.Services.AddScoped<IEmailService,EmailService>();
 builder.Services.AddScoped<IClaimsTransformation,UserClaimProvider>();
+builder.Services.AddScoped<IAuthorizationHandler, ExchangeExpireRequirementHandler>();
 
 
 builder.Services.AddAuthorization(options =>
@@ -45,7 +48,14 @@ builder.Services.AddAuthorization(options =>
         //policy.RequireClaim("city", "ankara","istanbul");
         //policy.RequireRole("admin");
     });
+
+    options.AddPolicy("ExchangePolicy", policy =>
+    {
+        policy.AddRequirements(new ExchangeExpireRequirement());
+    });
 });
+
+
 
 //builder.Services.AddHttpContextAccessor();
 

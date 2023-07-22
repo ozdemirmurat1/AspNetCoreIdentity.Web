@@ -5,7 +5,7 @@ namespace AspNetCoreIdentity.Web.Requirements
 {
     public class ExchangeExpireRequirement:IAuthorizationRequirement
     {
-
+        // Parametre alsaydı buradan halledecektik
     }
 
     public class ExchangeExpireRequirementHandler : AuthorizationHandler<ExchangeExpireRequirement>
