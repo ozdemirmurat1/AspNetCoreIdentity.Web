@@ -32,6 +32,21 @@ builder.Services.AddIdentityWithExt();
 // DbContext in yaþam döngüsü scope tur.
 builder.Services.AddScoped<IEmailService,EmailService>();
 builder.Services.AddScoped<IClaimsTransformation,UserClaimProvider>();
+
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AnkaraPolicy", policy =>
+    {
+        policy.RequireClaim("city", "ankara");
+
+
+        // Birden fazla yetkilendirme olsaydý þehirleri yanyana yazardýk.
+        //policy.RequireClaim("city", "ankara","istanbul");
+        //policy.RequireRole("admin");
+    });
+});
+
 //builder.Services.AddHttpContextAccessor();
 
 builder.Services.ConfigureApplicationCookie(opt =>

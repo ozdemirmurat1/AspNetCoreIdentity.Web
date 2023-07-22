@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace AspNetCoreIdentity.Web.Controllers
 {
@@ -41,16 +42,16 @@ namespace AspNetCoreIdentity.Web.Controllers
 
         // Identity kütüphanesi returnUrl i dolduracak
         [HttpPost]
-        public async Task<IActionResult> SignIn(SignInViewModel model,string returnUrl=null)
+        public async Task<IActionResult> SignIn(SignInViewModel model, string returnUrl = null)
         {
             if (!ModelState.IsValid)
             {
                 return View();
             }
 
-            returnUrl ??=  Url.Action("Index", "Home");
+            returnUrl ??= Url.Action("Index", "Home");
 
-            var hasUser=await _userManager.FindByEmailAsync(model.Email);
+            var hasUser = await _userManager.FindByEmailAsync(model.Email);
 
             if (hasUser == null)
             {
@@ -59,7 +60,7 @@ namespace AspNetCoreIdentity.Web.Controllers
             }
 
             // bu işlemde cookie oluşturulur.
-            var signInResult = await _signInManager.PasswordSignInAsync(hasUser, model.Password,model.RememberMe,true);
+            var signInResult = await _signInManager.PasswordSignInAsync(hasUser, model.Password, model.RememberMe, true);
 
             if (signInResult.Succeeded)
             {
@@ -71,13 +72,13 @@ namespace AspNetCoreIdentity.Web.Controllers
                 ModelState.AddModelErrorList(new List<string> { "3 dakika boyunca giriş yapamazsınız." });
                 return View();
             }
-                
-            
-            ModelState.AddModelErrorList(new List<string> { $"Email veya şifreniz yanlış",$"(Başarısız giriş sayısı:{await _userManager.GetAccessFailedCountAsync(hasUser)}" });
-            
+
+
+            ModelState.AddModelErrorList(new List<string> { $"Email veya şifreniz yanlış", $"(Başarısız giriş sayısı:{await _userManager.GetAccessFailedCountAsync(hasUser)}" });
+
 
             return View();
-            
+
         }
 
         public IActionResult SignUp()
@@ -95,18 +96,33 @@ namespace AspNetCoreIdentity.Web.Controllers
             if (!ModelState.IsValid)
                 return View();
 
-            var identityResult=await _userManager.CreateAsync(new() { UserName = request.UserName, PhoneNumber = request.Phone, Email = request.Email }, request.PasswordConfirm);
+            var identityResult = await _userManager.CreateAsync(new() { UserName = request.UserName, PhoneNumber = request.Phone, Email = request.Email }, request.PasswordConfirm);
 
-            if (identityResult.Succeeded)
+            if (!identityResult.Succeeded)
             {
-                // TempData datayı taşıma işlemlerinde kullanılır
-                TempData["SuccessMessage"] = "Üyelik kayıt işlemi başarı ile gerçekleşmiştir.";
-                return RedirectToAction(nameof(HomeController.SignUp));
+                ModelState.AddModelErrorList(identityResult.Errors.Select(x => x.Description).ToList());
+                return View();
             }
 
-            ModelState.AddModelErrorList(identityResult.Errors.Select(x=>x.Description).ToList());
+            var exchangeExpireClaim = new Claim("ExchangeExpireDate", DateTime.Now.AddDays(10).ToString());
 
-            return View();
+            var user = await _userManager.FindByNameAsync(request.UserName);
+
+            var claimResult = await _userManager.AddClaimAsync(user!, exchangeExpireClaim);
+
+            if (!claimResult.Succeeded)
+            {
+                ModelState.AddModelErrorList(claimResult.Errors.Select(x => x.Description).ToList());
+                return View();
+            }
+
+
+            // TempData datayı taşıma işlemlerinde kullanılır
+            TempData["SuccessMessage"] = "Üyelik kayıt işlemi başarı ile gerçekleşmiştir.";
+            return RedirectToAction(nameof(HomeController.SignUp));
+
+
+
         }
 
         public IActionResult ForgetPassword()
@@ -144,7 +160,7 @@ namespace AspNetCoreIdentity.Web.Controllers
 
         }
 
-        public IActionResult ResetPassword(string userId,string token)
+        public IActionResult ResetPassword(string userId, string token)
         {
             // Requestler arası data TempData üzerinden taşınır. ViewModel de hidden input type üzerinden de alınabilir
 
@@ -160,7 +176,7 @@ namespace AspNetCoreIdentity.Web.Controllers
             var userId = TempData["userId"];
             var token = TempData["token"];
 
-            if(userId == null || token==null) 
+            if (userId == null || token == null)
             {
                 throw new Exception("Bir hata meydana geldi");
             }
@@ -173,7 +189,7 @@ namespace AspNetCoreIdentity.Web.Controllers
             }
 
 
-            var result=await _userManager.ResetPasswordAsync(hasUser,token.ToString()!,request.Password);
+            var result = await _userManager.ResetPasswordAsync(hasUser, token.ToString()!, request.Password);
             if (result.Succeeded)
             {
                 TempData["SuccessMessage"] = "Şifreniz başarıyla yenilenmiştir.";
@@ -181,7 +197,7 @@ namespace AspNetCoreIdentity.Web.Controllers
             else
             {
                 ModelState.AddModelErrorList(result.Errors.Select(x => x.Description).ToList());
-                
+
             }
 
             return View();

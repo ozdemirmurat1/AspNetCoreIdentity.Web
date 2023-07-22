@@ -18,7 +18,7 @@ namespace AspNetCoreIdentity.Web.ClaimProviders
         {
             var identityUser = principal.Identity as ClaimsIdentity;
 
-            var currentUser=await _userManager.FindByNameAsync(identityUser!.Name!);
+            var currentUser = await _userManager.FindByNameAsync(identityUser!.Name!);
 
             //if (currentUser == null)
             //{
@@ -31,12 +31,12 @@ namespace AspNetCoreIdentity.Web.ClaimProviders
             }
 
 
-                if (principal.HasClaim(x => x.Type != "city"))
-                {
-                    Claim cityClaim = new Claim("city", currentUser.City);
-                    identityUser.AddClaim(cityClaim);
-                }
-            
+            if (principal.HasClaim(x => x.Type != "city"))
+            {
+                Claim cityClaim = new Claim("city", currentUser.City);
+                identityUser.AddClaim(cityClaim);
+            }
+
 
             return principal;
         }
