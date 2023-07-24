@@ -8,6 +8,7 @@ namespace AspNetCoreIdentity.Web.Requirements
         // Parametre alsaydı buradan halledecektik
     }
 
+    //Aşağıdaki class ı dependency ınjection ettik program cs de
     public class ExchangeExpireRequirementHandler : AuthorizationHandler<ExchangeExpireRequirement>
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ExchangeExpireRequirement requirement)

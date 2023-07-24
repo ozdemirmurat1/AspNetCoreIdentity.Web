@@ -35,6 +35,7 @@ builder.Services.AddIdentityWithExt();
 builder.Services.AddScoped<IEmailService,EmailService>();
 builder.Services.AddScoped<IClaimsTransformation,UserClaimProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, ExchangeExpireRequirementHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, ViolenceRequirementHandler>();
 
 
 builder.Services.AddAuthorization(options =>
@@ -52,6 +53,11 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ExchangePolicy", policy =>
     {
         policy.AddRequirements(new ExchangeExpireRequirement());
+    });
+
+    options.AddPolicy("ViolencePolicy", policy =>
+    {
+        policy.AddRequirements(new ViolenceRequirement() { ThresholdAge=18});
     });
 });
 

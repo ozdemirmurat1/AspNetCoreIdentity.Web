@@ -59,13 +59,10 @@ namespace AspNetCoreIdentity.Web.Controllers
                 return View();
             }
 
+
+
             // bu işlemde cookie oluşturulur.
             var signInResult = await _signInManager.PasswordSignInAsync(hasUser, model.Password, model.RememberMe, true);
-
-            if (signInResult.Succeeded)
-            {
-                return Redirect(returnUrl);
-            }
 
             if (signInResult.IsLockedOut)
             {
@@ -73,11 +70,17 @@ namespace AspNetCoreIdentity.Web.Controllers
                 return View();
             }
 
+            if (!signInResult.Succeeded)
+            {
+                ModelState.AddModelErrorList(new List<string> { $"Email veya şifreniz yanlış", $"(Başarısız giriş sayısı:{await _userManager.GetAccessFailedCountAsync(hasUser)}" });
+                return View();
+            }
 
-            ModelState.AddModelErrorList(new List<string> { $"Email veya şifreniz yanlış", $"(Başarısız giriş sayısı:{await _userManager.GetAccessFailedCountAsync(hasUser)}" });
-
-
-            return View();
+            if (hasUser.BirthDate.HasValue)
+            {
+                await _signInManager.SignInWithClaimsAsync(hasUser, model.RememberMe, new[] { new Claim("birthdate", hasUser.BirthDate.Value.ToString()) });
+            }
+            return Redirect(returnUrl);
 
         }
 
