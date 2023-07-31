@@ -19,7 +19,10 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlCon"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlCon"), options =>
+    {
+        options.MigrationsAssembly("AspNetCoreIdentityApp.Repository");
+    });
 });
 
 builder.Services.Configure<SecurityStampValidatorOptions>(options =>
