@@ -5,17 +5,21 @@ using AspNetCoreIdentity.Core.OptionsModel;
 using AspNetCoreIdentity.Core.PermissionsRoot;
 using AspNetCoreIdentity.Web.Requirements;
 using AspNetCoreIdentity.Web.Seeds;
-using AspNetCoreIdentity.Web.Services;
+using AspNetCoreIdentity.Service.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using AspNetCoreIdentityApp.Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+
+// AppDbContext scope yaþam döngüsüne sahiptir.
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -41,7 +45,7 @@ builder.Services.AddScoped<IEmailService,EmailService>();
 builder.Services.AddScoped<IClaimsTransformation,UserClaimProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, ExchangeExpireRequirementHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, ViolenceRequirementHandler>();
-
+builder.Services.AddScoped<IMemberService, MemberService>();
 
 builder.Services.AddAuthorization(options =>
 {
