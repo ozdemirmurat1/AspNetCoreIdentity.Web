@@ -9,6 +9,7 @@ using Microsoft.Extensions.FileProviders;
 using System.Collections.Generic;
 using System.Security.Claims;
 using AspNetCoreIdentity.Core.Models;
+using AspNetCoreIdentityApp.Service.Services;
 
 namespace AspNetCoreIdentity.Web.Controllers
 {
@@ -18,38 +19,29 @@ namespace AspNetCoreIdentity.Web.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
         private readonly IFileProvider _fileProvider;
+        private readonly IMemberService _memberService;
+
+        //=> sadece get i olan bir property anlamına gelir.
+        private string userName => User.Identity!.Name;
+
         //private readonly IHttpContextAccessor _contextAccessor;
 
-        public MemberController(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager, IFileProvider fileProvider)
+        public MemberController(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager, IFileProvider fileProvider, IMemberService memberService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _fileProvider = fileProvider;
+            _memberService = memberService;
         }
 
         public async Task<IActionResult> Index()
         {
-            // HttpContext controller olmayan sınıflarda ulaşmak için kullanılır. Aşağıdaki metotta kullansak da olur kullanmasak da olur. Zaten controller sınıfındayız. IHttpContextAccessor sınıfını da dependencyInjection yaparak HttpContext e ulaşabilirsin. Dah sonra builder.Services.AddHttpContextAccessor(); u Program cs.e eklemelisin.
-
-            //var userClaims = HttpContext.User.Claims.ToList();
-            //var email = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
-
-            var currentUser=await _userManager.FindByNameAsync(User.Identity.Name);
-
-            var userViewModel = new UserViewModel 
-            { 
-                Email=currentUser.Email ,
-                PhoneNumber=currentUser.PhoneNumber,
-                UserName=currentUser.UserName,
-                PictureUrl=currentUser.Picture
-            };
-
-            return View(userViewModel);
+            return View(await _memberService.GetUserViewModelByUserNameAssync(userName));
         }
 
         public async Task LogOut()
         {
-            await _signInManager.SignOutAsync();       
+           await _memberService.LogOutAsync();      
         }
 
         public IActionResult PasswordChange()

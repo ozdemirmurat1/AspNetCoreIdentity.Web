@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AspNetCoreIdentity.Core.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,8 @@ namespace AspNetCoreIdentityApp.Service.Services
 {
     public interface IMemberService
     {
+        Task<UserViewModel> GetUserViewModelByUserNameAssync(string userName);
+
+        Task LogOutAsync();
     }
 }
