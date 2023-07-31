@@ -1,4 +1,4 @@
-﻿namespace AspNetCoreIdentity.Web.PermissionsRoot
+﻿namespace AspNetCoreIdentity.Core.PermissionsRoot
 {
     public static class Permission
     {

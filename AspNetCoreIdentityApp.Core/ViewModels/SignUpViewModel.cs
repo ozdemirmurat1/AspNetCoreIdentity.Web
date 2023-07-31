@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace AspNetCoreIdentity.Web.ViewModels
+namespace AspNetCoreIdentity.Core.ViewModels
 {
     public class SignUpViewModel
     {
