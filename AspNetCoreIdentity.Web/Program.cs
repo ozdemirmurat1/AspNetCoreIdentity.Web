@@ -1,6 +1,6 @@
 using AspNetCoreIdentity.Web.ClaimProviders;
 using AspNetCoreIdentity.Web.Extensions;
-using AspNetCoreIdentity.Web.Models;
+using AspNetCoreIdentity.Repository.Models;
 using AspNetCoreIdentity.Core.OptionsModel;
 using AspNetCoreIdentity.Core.PermissionsRoot;
 using AspNetCoreIdentity.Web.Requirements;

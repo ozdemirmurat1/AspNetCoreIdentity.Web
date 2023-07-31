@@ -1,5 +1,5 @@
 ﻿using AspNetCoreIdentity.Web.Extensions;
-using AspNetCoreIdentity.Web.Models;
+using AspNetCoreIdentity.Repository.Models;
 using AspNetCoreIdentity.Web.Services;
 using AspNetCoreIdentity.Core.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Diagnostics;
 using System.Security.Claims;
+using AspNetCoreIdentityApp.Core.ViewModels;
 
 namespace AspNetCoreIdentity.Web.Controllers
 {
