@@ -2,6 +2,7 @@ using AspNetCoreIdentity.Web.ClaimProviders;
 using AspNetCoreIdentity.Web.Extensions;
 using AspNetCoreIdentity.Web.Models;
 using AspNetCoreIdentity.Web.OptionsModel;
+using AspNetCoreIdentity.Web.PermissionsRoot;
 using AspNetCoreIdentity.Web.Requirements;
 using AspNetCoreIdentity.Web.Seeds;
 using AspNetCoreIdentity.Web.Services;
@@ -59,6 +60,28 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ViolencePolicy", policy =>
     {
         policy.AddRequirements(new ViolenceRequirement() { ThresholdAge=18});
+    });
+
+    options.AddPolicy("OrderPermissionReadAndDelete", policy =>
+    {
+        policy.RequireClaim("permission", Permission.Order.Read);
+        policy.RequireClaim("permission", Permission.Order.Delete);
+        policy.RequireClaim("permission", Permission.Stock.Delete);
+    });
+
+    options.AddPolicy("Permissions.Order.Read", policy =>
+    {
+        policy.RequireClaim("permission", Permission.Order.Read);
+    });
+
+    options.AddPolicy("Permissions.Order.Delete", policy =>
+    {
+        policy.RequireClaim("permission", Permission.Order.Delete);
+    });
+
+    options.AddPolicy("Permissions.Stock.Delete", policy =>
+    {
+        policy.RequireClaim("permission", Permission.Stock.Read);
     });
 });
 
