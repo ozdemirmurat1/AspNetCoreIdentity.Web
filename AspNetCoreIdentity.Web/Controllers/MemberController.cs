@@ -57,29 +57,19 @@ namespace AspNetCoreIdentity.Web.Controllers
                 return View();
             }
 
-            var currentUser =await _userManager.FindByNameAsync(User.Identity.Name);
-
-            var checkOldPassword =await _userManager.CheckPasswordAsync(currentUser, request.PasswordOld);
-
-            if (!checkOldPassword)
+            if (! await _memberService.CheckPasswordAsync(userName,request.PasswordOld))
             {
                 ModelState.AddModelError(string.Empty, "Eski şifreniz yanlış");
                 return View();
             }
 
-            var resultChangePassword = await _userManager.ChangePasswordAsync(currentUser,request.PasswordOld,request.PasswordNew);
+            var (isSuccess,errors) = await _memberService.ChangePasswordAsync(userName, request.PasswordOld, request.PasswordNew);
 
-            if (!resultChangePassword.Succeeded)
+            if (!isSuccess)
             {
-                ModelState.AddModelErrorList(resultChangePassword.Errors);
+                ModelState.AddModelErrorList(errors);
                 return View();
             }
-
-            //// SecutityStamp'ı hassas bilgiler değiştiğinde güncelliyoruz.Örneğin kullanıcın hesabı hem mobilde hem web de açık. web de güncelleme yaptı. Bu değişiklikler mobil e de yansısın.
-            // kullanıcının cookie'si yenilenmesi için ilk önce signOut yaptık daha sonra PasswordSignIn ile login olduk.
-            await _userManager.UpdateSecurityStampAsync(currentUser);
-            await _signInManager.SignOutAsync();
-            await _signInManager.PasswordSignInAsync(currentUser, request.PasswordNew, true,false);
 
             TempData["SuccessMessage"] = "Şifreniz başarıyla değiştirilmiştir.";
 
