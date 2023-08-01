@@ -78,21 +78,9 @@ namespace AspNetCoreIdentity.Web.Controllers
 
         public async Task<IActionResult> UserEdit()
         {
-            ViewBag.genderList = new SelectList(Enum.GetNames(typeof(Gender)));
+            ViewBag.genderList = _memberService.GetGenderSelectList();
 
-            var currentUser = await _userManager.FindByNameAsync(User.Identity!.Name!)!;
-
-            var userEditViewModel = new UserEditViewModel()
-            {
-                UserName=currentUser.UserName,
-                Email=currentUser.Email,
-                Phone=currentUser.PhoneNumber,
-                BirthDate=currentUser.BirthDate,
-                City=currentUser.City,
-                Gender=currentUser.Gender,
-            };
-
-            return View(userEditViewModel);
+            return View(await _memberService.GetUserEditViewModelAsync(userName));
         }
 
         [HttpPost]
@@ -102,69 +90,18 @@ namespace AspNetCoreIdentity.Web.Controllers
                 return View();
 
 
-            var currentUser=await _userManager.FindByNameAsync(User.Identity!.Name!);
+            var (isSuccess, errors) = await _memberService.EditUserAsync(request, userName);
 
-            currentUser.UserName=request.UserName;
-            currentUser.Email=request.Email;
-            currentUser.BirthDate=request.BirthDate;
-            currentUser.City=request.City;
-            currentUser.Gender=request.Gender;
-            currentUser.PhoneNumber = request.Phone;
-
-            
-
-            if(request.Picture!=null && request.Picture.Length>0)
+            if (!isSuccess)
             {
-                // benim referans klasörüm AspNetCoreIdentity.Web bunu program cs de belirttik.Bunun altındaki klasörü tarar.
-
-                var wwrootFolder = _fileProvider.GetDirectoryContents("wwwroot");
-
-                var randomFileName=  $"{Guid.NewGuid().ToString()}{Path.GetExtension(request.Picture.FileName)}"; // .jpg
-
-                var newPicturePath = Path.Combine(wwrootFolder!.First(x => x.Name == "userpictures").PhysicalPath!, randomFileName);
-
-                using var stream = new FileStream(newPicturePath, FileMode.Create);
-
-                await request.Picture.CopyToAsync(stream);
-
-                currentUser.Picture = randomFileName;
-            }
-
-            var updateToUserResult=  await _userManager.UpdateAsync(currentUser);
-
-            if (!updateToUserResult.Succeeded)
-            {
-                ModelState.AddModelErrorList(updateToUserResult.Errors);
+                ModelState.AddModelErrorList(errors!);
                 return View();
             }
 
-            // SecutityStamp'ı hassas bilgiler değiştiğinde güncelliyoruz.Örneğin kullanıcın hesabı hem mobilde hem web de açık. web de güncelleme yaptı. Bu değişiklikler mobil e de yansısın.
-
-            await _userManager.UpdateSecurityStampAsync(currentUser);
-            await _signInManager.SignOutAsync();
-
-            if (request.BirthDate.HasValue)
-            {
-                await _signInManager.SignInWithClaimsAsync(currentUser, true, new[] { new Claim("birthdate", currentUser.BirthDate.Value.ToString()) });
-            }
-            else
-            {
-                await _signInManager.SignInAsync(currentUser, true);
-            }
 
             TempData["SuccessMessage"] = "Üye bilgileri başarıyla değiştirilmiştir.";
 
-            var userEditViewModel = new UserEditViewModel()
-            {
-                UserName = currentUser.UserName,
-                Email = currentUser.Email,
-                Phone = currentUser.PhoneNumber,
-                BirthDate = currentUser.BirthDate,
-                City = currentUser.City,
-                Gender = currentUser.Gender,
-            };
-
-            return RedirectToAction("Index");
+            return View(await _memberService.GetUserEditViewModelAsync(userName));
 
         }
 
@@ -181,14 +118,7 @@ namespace AspNetCoreIdentity.Web.Controllers
         [HttpGet]
         public IActionResult Claims()
         {
-            var userClaims = User.Claims.Select(x => new ClaimViewModel()
-            {
-                Issuer=x.Issuer,
-                Type=x.Type,
-                Value=x.Value,
-            }).ToList();
-
-            return View(userClaims);
+            return View(_memberService.GetClaims(User));
         }
 
         [Authorize(Policy = "AnkaraPolicy")]

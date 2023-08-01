@@ -20,7 +20,7 @@ namespace AspNetCoreIdentity.Service.Services
 
             smptClient.Host = _emailSettings.Host;
             smptClient.DeliveryMethod = SmtpDeliveryMethod.Network;
-            smptClient.UseDefaultCredentials = false;
+            smptClient.UseDefaultCredentials = true;
             smptClient.Port = 587;
             smptClient.Credentials = new NetworkCredential(_emailSettings.Email, _emailSettings.Password);
             smptClient.EnableSsl = true;
